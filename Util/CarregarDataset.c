@@ -55,10 +55,7 @@ int carregarDataset(Aluno *alunos)
             colunas[i] = strtok(NULL, ",");
 
         Aluno aluno;
-        aluno.horasEstudo = atof(colunas[5]);
         aluno.numeroFaltas = atof(colunas[6]);
-        aluno.reforco = atoi(colunas[7]);
-        aluno.suporte = atoi(colunas[8]);
         aluno.media = atof(colunas[13]);
         aluno.cluster = -1;
 
@@ -73,9 +70,7 @@ int carregarDataset(Aluno *alunos)
 void normalizarAlunos(Aluno *alunos, int total)
 {
     float minMedia = alunos[0].media, maxMedia = alunos[0].media;
-    float minHoras = alunos[0].horasEstudo, maxHoras = alunos[0].horasEstudo;
     float minFaltas = alunos[0].numeroFaltas, maxFaltas = alunos[0].numeroFaltas;
-    float minSuporte = alunos[0].suporte, maxSuporte = alunos[0].suporte;
 
     for (int i = 1; i < total; i++)
     {
@@ -84,27 +79,15 @@ void normalizarAlunos(Aluno *alunos, int total)
         if (alunos[i].media > maxMedia)
             maxMedia = alunos[i].media;
 
-        if (alunos[i].horasEstudo < minHoras)
-            minHoras = alunos[i].horasEstudo;
-        if (alunos[i].horasEstudo > maxHoras)
-            maxHoras = alunos[i].horasEstudo;
-
         if (alunos[i].numeroFaltas < minFaltas)
             minFaltas = alunos[i].numeroFaltas;
         if (alunos[i].numeroFaltas > maxFaltas)
             maxFaltas = alunos[i].numeroFaltas;
-
-        if (alunos[i].suporte < minSuporte)
-            minSuporte = alunos[i].suporte;
-        if (alunos[i].suporte > maxSuporte)
-            maxSuporte = alunos[i].suporte;
     }
 
     for (int i = 0; i < total; i++)
     {
         alunos[i].media = (alunos[i].media - minMedia) / (maxMedia - minMedia);
-        alunos[i].horasEstudo = (alunos[i].horasEstudo - minHoras) / (maxHoras - minHoras);
         alunos[i].numeroFaltas = (alunos[i].numeroFaltas - minFaltas) / (maxFaltas - minFaltas);
-        alunos[i].suporte = (alunos[i].suporte - minSuporte) / (maxSuporte - minSuporte);
     }
 }

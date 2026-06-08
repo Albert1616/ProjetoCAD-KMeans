@@ -7,14 +7,9 @@
 float distEuclidiana(Aluno *aluno, Aluno *centroid)
 {
     float diffMedia = pow(aluno->media - centroid->media, 2);
-    float diffHoras = pow(aluno->horasEstudo - centroid->horasEstudo, 2);
     float diffFaltas = pow(aluno->numeroFaltas - centroid->numeroFaltas, 2);
-    float diffSuporte = pow(aluno->suporte - centroid->suporte, 2);
-    float diffTutoring = pow(aluno->reforco - centroid->reforco, 2);
 
-    return sqrt(diffMedia + diffHoras +
-                diffFaltas + diffSuporte +
-                diffTutoring);
+    return sqrt(diffMedia + diffFaltas);
 }
 
 int minListaIndex(float lista[], int tamanho)
@@ -38,16 +33,15 @@ void initCentroids(KMeans *model, Aluno *alunos)
 {
     int listIndex[model->k];
     for (int i = 0; i < model->k; i++)
-        listIndex[i] = -1; // inicializa com valor inválido
+        listIndex[i] = -1;
 
     srand(model->random_state);
 
     for (int i = 0; i < model->k; i++)
     {
         int index = rand() % model->totalAlunos;
-
-        // verifica se o índice já foi usado
         int duplicado = 0;
+
         for (int j = 0; j < i; j++)
         {
             if (listIndex[j] == index)
@@ -92,10 +86,7 @@ void updateCentroids(KMeans *model, Aluno *alunos)
     for (int i = 0; i < model->k; i++)
     {
         newCentroids[i].media = 0;
-        newCentroids[i].horasEstudo = 0;
         newCentroids[i].numeroFaltas = 0;
-        newCentroids[i].suporte = 0;
-        newCentroids[i].reforco = 0;
         countAlunos[i] = 0;
     }
 
@@ -104,10 +95,7 @@ void updateCentroids(KMeans *model, Aluno *alunos)
         int clusterIndex = alunos[i].cluster;
 
         newCentroids[clusterIndex].media += alunos[i].media;
-        newCentroids[clusterIndex].horasEstudo += alunos[i].horasEstudo;
         newCentroids[clusterIndex].numeroFaltas += alunos[i].numeroFaltas;
-        newCentroids[clusterIndex].suporte += alunos[i].suporte;
-        newCentroids[clusterIndex].reforco += alunos[i].reforco;
         countAlunos[clusterIndex]++;
     }
 
@@ -116,10 +104,7 @@ void updateCentroids(KMeans *model, Aluno *alunos)
         if (countAlunos[i] > 0)
         {
             model->centroids[i].media = newCentroids[i].media / countAlunos[i];
-            model->centroids[i].horasEstudo = newCentroids[i].horasEstudo / countAlunos[i];
             model->centroids[i].numeroFaltas = newCentroids[i].numeroFaltas / countAlunos[i];
-            model->centroids[i].suporte = newCentroids[i].suporte / countAlunos[i];
-            model->centroids[i].reforco = newCentroids[i].reforco / countAlunos[i];
         }
     }
 }

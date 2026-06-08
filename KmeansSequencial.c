@@ -5,21 +5,18 @@
 #include "Model/dataset.h"
 #include "Model/Kmeans.h"
 
-#define NUM_CLUSTERS 5
-#define MAX_ITERATIONS 400
+#define NUM_CLUSTERS 3
+#define MAX_ITERATIONS 10000
 
 void exportarResultados(Aluno *alunos, int total)
 {
     FILE *file = fopen("resultados.csv", "w");
-    fprintf(file, "horasEstudo,numeroFaltas,media,suporte,reforco,cluster\n");
+    fprintf(file, "numeroFaltas,media,cluster\n");
 
     for (int i = 0; i < total; i++)
-        fprintf(file, "%.2f,%.2f,%.2f,%.2f,%.2f,%d\n",
-                alunos[i].horasEstudo,
+        fprintf(file, "%.2f,%.2f,%d\n",
                 alunos[i].numeroFaltas,
                 alunos[i].media,
-                alunos[i].suporte,
-                alunos[i].reforco,
                 alunos[i].cluster);
 
     fclose(file);
@@ -27,10 +24,9 @@ void exportarResultados(Aluno *alunos, int total)
 
 int main()
 {
-    int numeroAlunos = 0;
     // Dados de cada aluno
     Aluno *alunos = (Aluno *)malloc(3000 * sizeof(Aluno));
-    numeroAlunos = carregarDataset(alunos);
+    int numeroAlunos = carregarDataset(alunos);
 
     normalizarAlunos(alunos, numeroAlunos);
 
@@ -42,39 +38,27 @@ int main()
     kmeans.centroids = (Aluno *)malloc(kmeans.k * sizeof(Aluno));
     kmeans.totalAlunos = numeroAlunos;
 
-    // // Treinamento
+    // Treinamento
     fit(&kmeans, alunos);
-    int numAlunosCluster = 0;
-
-    // // Visualização dos resultados
-    // for (int i = 0; i < kmeans.k; i++)
-    // {
-    //     numAlunosCluster = 0;
-    //     for (int j = 0; j < kmeans.totalAlunos; j++)
-    //     {
-    //         if (alunos[j].cluster == i)
-    //         {
-    //             // printf("Aluno %d: Media: %.2f, Horas de Estudo: %.2f, Numero de Faltas: %.2f\n, Cluster: %d\n", j + 1, alunos[j].media, alunos[j].horasEstudo, alunos[j].numeroFaltas, alunos[j].cluster);
-    //             numAlunosCluster++;
-    //         }
-    //     }
-    //     printf("Cluster %d: %d alunos\n", i, numAlunosCluster);
-    // }
-
-    // // for (int i = 0; i < 100; i++)
-    // // {
-    // //     printf("Aluno %d: Media: %.2f, Horas de Estudo: %.2f, Numero de Faltas: %.2f\n", i + 1, alunos[i].media, alunos[i].horasEstudo, alunos[i].numeroFaltas);
-    // // }
 
     exportarResultados(alunos, numeroAlunos);
-    float *inertia = methodElbow(&kmeans, alunos);
 
-    for (int i = 0; i < 7; i++)
+    // Visulalizar centroides
+    for (int i = 0; i < kmeans.k; i++)
     {
-        printf("k: %d, Inertia: %.4f\n", i + 2, inertia[i]);
+        printf("Centroid %d - Media: %.2f, Numero de Faltas: %.2f\n", i, kmeans.centroids[i].media, kmeans.centroids[i].numeroFaltas);
     }
+
+    // Predição de um novo aluno
+    Aluno novoAluno;
+    novoAluno.media = 0.95;
+    novoAluno.numeroFaltas = 0.95;
+
+    predict(&kmeans, &novoAluno);
+    printf("Novo aluno - Media: %.2f, Numero de Faltas: %.2f, Cluster: %d\n", novoAluno.media, novoAluno.numeroFaltas, novoAluno.cluster);
 
     free(kmeans.centroids);
     free(alunos);
+
     return 0;
 }

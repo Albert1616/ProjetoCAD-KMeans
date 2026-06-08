@@ -4,10 +4,7 @@
 typedef struct
 {
     float media;
-    float horasEstudo;
     float numeroFaltas;
-    float reforco;
-    float suporte;
     int cluster;
 } Aluno;
 
