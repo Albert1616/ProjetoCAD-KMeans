@@ -3,6 +3,7 @@
 #define DATASET_H
 
 char *retornarDadoPorIndice(char *linha, int index);
-void carregarDataset(Aluno *alunos);
+int carregarDataset(Aluno *alunos);
+void normalizarAlunos(Aluno *alunos, int total);
 
 #endif // DATASET_H
