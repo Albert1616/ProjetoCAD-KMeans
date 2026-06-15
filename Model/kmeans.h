@@ -1,6 +1,6 @@
 #ifndef KMEANS_H
 #define KMEANS_H
-#include "Aluno.h"
+#include "aluno.h"
 
 typedef struct
 {

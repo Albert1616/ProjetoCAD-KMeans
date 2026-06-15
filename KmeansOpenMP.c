@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 #include "Model/aluno.h"
 #include "Model/dataset.h"
 #include "Model/kmeans.h"
@@ -10,7 +11,7 @@
 
 void exportarResultados(Aluno *alunos, int total)
 {
-    FILE *file = fopen("resultados.csv", "w");
+    FILE *file = fopen("resultados_openmp.csv", "w");
     fprintf(file, "numeroFaltas,media,cluster\n");
 
     for (int i = 0; i < total; i++)
@@ -22,8 +23,17 @@ void exportarResultados(Aluno *alunos, int total)
     fclose(file);
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    // Usuário pode definir número de threads em tempo de execução: ./KMeansOpenMP <threads>
+    if (argc > 1)
+    {
+        int nt = atoi(argv[1]);
+        if (nt > 0)
+            omp_set_num_threads(nt);
+    }
+
+    printf("Using %d OpenMP threads\n", omp_get_max_threads());
     // Dados de cada aluno
     Aluno *alunos = (Aluno *)malloc(3000 * sizeof(Aluno));
     int numeroAlunos = carregarDataset(alunos);

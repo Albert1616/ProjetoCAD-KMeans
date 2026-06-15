@@ -1,5 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <omp.h>
 #include "../Model/aluno.h"
 #include "../Model/kmeans.h"
 
@@ -111,6 +113,8 @@ void updateCentroids(KMeans *model, Aluno *alunos)
 
 void fit(KMeans *model, Aluno *alunos)
 {
+    double t_start = omp_get_wtime();
+
     initCentroids(model, alunos);
 
     for (int i = 0; i < model->max_iter; i++)
@@ -137,6 +141,9 @@ void fit(KMeans *model, Aluno *alunos)
             break;
         }
     }
+
+    double t_end = omp_get_wtime();
+    printf("KMeans fit wall time: %.6f s\n", t_end - t_start);
 }
 
 void predict(KMeans *model, Aluno *novoAluno)
