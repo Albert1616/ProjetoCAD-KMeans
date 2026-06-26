@@ -11,6 +11,7 @@ Projeto em C que aplica KMeans para agrupar alunos por média e número de falta
 - `KmeansSequencial.c` — Versão sequencial.
 - `KmeansOpenMP.c` — Versão paralelizada com OpenMP (Memória Compartilhada).
 - `KmeansOpenMPMPI.c` — Versão OpenMP+MPI (Memória Distribuída + Compartilhada).
+- `KmeansOpenMPGPU.c` — Versão paralelizada com OpenMP na GPU(Memória Compartilhada).
 - `Util/Kmeans.c` — Utilitários da versão sequencial.
 - `Util/KmeansOpenMP_utils.c` — Utilitários da versão OpenMP.
 - `Util/KmeansOpenMPMPI_utils.c` — Utilitários da versão OpenMP+MPI.
@@ -56,6 +57,11 @@ A versão OpenMP+MPI utiliza MPI para distribuir os dados entre processos e Open
 make run-omp-mpi
 # Ou manualmente (ex: 2 processos, 4 threads cada):
 mpirun -np 2 ./KmeansOpenMPMPI 4
+```
+
+### Versão OpenMP
+```bash
+make run-omp-gpu
 ```
 
 ## Arquivo de dados
