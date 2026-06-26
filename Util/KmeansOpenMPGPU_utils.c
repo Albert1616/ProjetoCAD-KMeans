@@ -70,19 +70,23 @@ void initCentroids(KMeans *model, Aluno *alunos)
 
 void assignClusters(KMeans *model, Aluno *alunos)
 {
-    // Paraleliza o loop sobre alunos. Cada iteração usa um array local
-    // 'distanciaClusters_local' para evitar condições de corrida.
-    #pragma omp target teams loop 
+    #pragma omp target teams loop
     for (int i = 0; i < model->totalAlunos; i++)
     {
-        float distanciaClusters_local[model->k];
+        int melhorCluster = 0;
+        float menorDist = distEuclidiana(&alunos[i], &model->centroids[0]);
 
-        for (int j = 0; j < model->k; j++)
+        for (int j = 1; j < model->k; j++)
         {
-            distanciaClusters_local[j] = distEuclidiana(&alunos[i], &model->centroids[j]);
+            float d = distEuclidiana(&alunos[i], &model->centroids[j]);
+            if (d < menorDist)
+            {
+                menorDist = d;
+                melhorCluster = j;
+            }
         }
 
-        alunos[i].cluster = minListaIndex(distanciaClusters_local, model->k);
+        alunos[i].cluster = melhorCluster;
     }
 }
 
@@ -124,25 +128,28 @@ void fit(KMeans *model, Aluno *alunos)
 
     Aluno old_centroids[model->k];
     
-    #pragma omp target data map(to: alunos[0:n]) map(tofrom:model->centroids[0:k]) map(to:model[0:1])
+    #pragma omp target data map(to: alunos[0:n], model[0:1]) map(tofrom:model->centroids[0:k], old_centroids[0:k])
     for (int i = 0; i < model->max_iter; i++)
     {
-        #pragma omp target teams loop map(from: old_centroids[0:k])
+        int convergiu = 0;
+        #pragma omp target teams loop
         for (int j = 0; j < model->k; j++)
             old_centroids[j] = model->centroids[j];
 
         assignClusters(model, alunos);
         updateCentroids(model, alunos);
-        int convergiu = 1;
+        int nao_convergiu = 0;
 
-        #pragma omp target teams loop reduction(&:convergiu)
+        #pragma omp target teams loop reduction(+:nao_convergiu)
         for (int j = 0; j < model->k; j++)
         {
-            if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.01)
+            if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.01f)
             {
-                convergiu = 0;
+                nao_convergiu++;    
             }
         }
+
+        convergiu = (nao_convergiu == 0);
     }
 
     double t_end = omp_get_wtime();
