@@ -135,7 +135,7 @@ void fit(KMeans *model, Aluno *alunos)
         updateCentroids(model, alunos);
         int convergiu = 1;
 
-        #pragma omp target teams distribute loop reduction(&:convergiu)
+        #pragma omp target teams loop reduction(&:convergiu)
         for (int j = 0; j < model->k; j++)
         {
             if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.01)
