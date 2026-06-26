@@ -41,7 +41,7 @@ void initCentroids(KMeans *model, Aluno *alunos)
     unsigned int seed = model->random_state;
     for (int i = 0; i < model->k; i++)
     {
-        int index = rand_r(&seed) % alunos->totalAlunos;
+        int index = rand_r(&seed) % model->totalAlunos;
         int duplicado = 0;
 
         for (int j = 0; j < i; j++)
@@ -72,7 +72,7 @@ void assignClusters(KMeans *model, Aluno *alunos)
 {
     // Paraleliza o loop sobre alunos. Cada iteração usa um array local
     // 'distanciaClusters_local' para evitar condições de corrida.
-    #pragma omp target teams loop present(model, alunos)
+    #pragma omp target teams loop 
     for (int i = 0; i < model->totalAlunos; i++)
     {
         float distanciaClusters_local[model->k];
@@ -88,7 +88,7 @@ void assignClusters(KMeans *model, Aluno *alunos)
 
 void updateCentroids(KMeans *model, Aluno *alunos)
 {
-    #pragma omp target teams loop present(alunos, model)
+    #pragma omp target teams loop
     for (int j = 0; j < model->k; j++)
     {
         float local_sum_media = 0.0f;
@@ -135,7 +135,7 @@ void fit(KMeans *model, Aluno *alunos)
         updateCentroids(model, alunos);
         int convergiu = 1;
 
-        #pragma omp target teams distribute loop reduction(&&:convergiu)
+        #pragma omp target teams distribute loop reduction(&:convergiu)
         for (int j = 0; j < model->k; j++)
         {
             if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.01)
