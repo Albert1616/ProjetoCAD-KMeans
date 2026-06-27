@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 #include "Model/aluno.h"
 #include "Model/dataset.h"
 #include "Model/Kmeans.h"
 
 #define NUM_CLUSTERS 3
 #define MAX_ITERATIONS 10000
+#define NUM_ALUNOS 200000
+#define NUM_FIT_ITERATIONS 50
 
 void exportarResultados(Aluno *alunos, int total)
 {
@@ -25,7 +28,7 @@ void exportarResultados(Aluno *alunos, int total)
 int main()
 {
     // Dados de cada aluno
-    Aluno *alunos = (Aluno *)malloc(3000 * sizeof(Aluno));
+    Aluno *alunos = (Aluno *)malloc(NUM_ALUNOS * sizeof(Aluno));
     int numeroAlunos = carregarDataset(alunos);
 
     normalizarAlunos(alunos, numeroAlunos);
@@ -38,8 +41,12 @@ int main()
     kmeans.centroids = (Aluno *)malloc(kmeans.k * sizeof(Aluno));
     kmeans.totalAlunos = numeroAlunos;
 
+    double inicio = omp_get_wtime();
     // Treinamento
-    fit(&kmeans, alunos);
+    fit(&kmeans, alunos, NUM_FIT_ITERATIONS);
+    double fim = omp_get_wtime();
+
+    printf("Duração do treinamento: %.2f\n", fim - inicio);
 
     exportarResultados(alunos, numeroAlunos);
 
@@ -51,8 +58,8 @@ int main()
 
     // Predição de um novo aluno
     Aluno novoAluno;
-    novoAluno.media = 0.95;
-    novoAluno.numeroFaltas = 0.95;
+    novoAluno.media = 0.72;
+    novoAluno.numeroFaltas = 0.30;
 
     predict(&kmeans, &novoAluno);
     printf("Novo aluno - Media: %.2f, Numero de Faltas: %.2f, Cluster: %d\n", novoAluno.media, novoAluno.numeroFaltas, novoAluno.cluster);

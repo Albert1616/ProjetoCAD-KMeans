@@ -35,7 +35,7 @@ int carregarDataset(Aluno *alunos)
         return 0;
     }
 
-    char linha[4000];
+    char linha[5000];
     int index = 0;
 
     while (fgets(linha, sizeof(linha), file) != NULL)
@@ -46,7 +46,7 @@ int carregarDataset(Aluno *alunos)
             continue;
         }
 
-        char copia[4000];
+        char copia[5000];
         strcpy(copia, linha);
 
         char *colunas[15];

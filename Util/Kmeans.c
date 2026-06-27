@@ -109,32 +109,35 @@ void updateCentroids(KMeans *model, Aluno *alunos)
     }
 }
 
-void fit(KMeans *model, Aluno *alunos)
+void fit(KMeans *model, Aluno *alunos, int numIteracoes)
 {
-    initCentroids(model, alunos);
-
-    for (int i = 0; i < model->max_iter; i++)
+    for (int iter = 0; iter < numIteracoes; iter++)
     {
-        Aluno old_centroids[model->k];
-        for (int j = 0; j < model->k; j++)
-            old_centroids[j] = model->centroids[j];
+        initCentroids(model, alunos);
 
-        assignClusters(model, alunos);
-        updateCentroids(model, alunos);
-        int convergiu = 1;
-
-        for (int j = 0; j < model->k; j++)
+        for (int i = 0; i < model->max_iter; i++)
         {
-            if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.01)
+            Aluno old_centroids[model->k];
+            for (int j = 0; j < model->k; j++)
+                old_centroids[j] = model->centroids[j];
+
+            assignClusters(model, alunos);
+            updateCentroids(model, alunos);
+            int convergiu = 1;
+
+            for (int j = 0; j < model->k; j++)
             {
-                convergiu = 0;
+                if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.01)
+                {
+                    convergiu = 0;
+                    break;
+                }
+            }
+
+            if (convergiu)
+            {
                 break;
             }
-        }
-
-        if (convergiu)
-        {
-            break;
         }
     }
 }
@@ -151,7 +154,7 @@ void predict(KMeans *model, Aluno *novoAluno)
     novoAluno->cluster = minListaIndex(distanciaClusters, model->k);
 }
 
-float *methodElbow(KMeans *model, Aluno *alunos)
+float *methodElbow(KMeans *model, Aluno *alunos, int numIteracoes)
 {
     int k_range[] = {2, 3, 4, 5, 6, 7, 8};
     int n = 7;
@@ -163,7 +166,7 @@ float *methodElbow(KMeans *model, Aluno *alunos)
         free(model->centroids);
         model->centroids = (Aluno *)malloc(model->k * sizeof(Aluno));
 
-        fit(model, alunos);
+        fit(model, alunos, numIteracoes);
 
         float inertia = 0;
         for (int j = 0; j < model->totalAlunos; j++)

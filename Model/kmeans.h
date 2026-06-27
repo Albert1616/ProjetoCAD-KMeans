@@ -15,7 +15,7 @@ void initCentroids(KMeans *model, Aluno *alunos);
 void assignClusters(KMeans *model, Aluno *alunos);
 void updateCentroids(KMeans *model, Aluno *alunos);
 void predict(KMeans *model, Aluno *novoAluno);
-void fit(KMeans *model, Aluno *alunos);
-float *methodElbow(KMeans *model, Aluno *alunos);
+void fit(KMeans *model, Aluno *alunos, int numIteracoes);
+float *methodElbow(KMeans *model, Aluno *alunos, int numIteracoes);
 
 #endif // KMEANS_H
