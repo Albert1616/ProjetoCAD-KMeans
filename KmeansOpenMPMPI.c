@@ -9,7 +9,7 @@
 
 #define NUM_CLUSTERS 3
 #define MAX_ITERATIONS 10000
-#define NUM_ALUNOS 200000
+#define NUM_ALUNOS 1000000
 #define NUM_FIT_ITERATIONS 50
 
 // Protótipos das funções no utils hybrid (não estão no kmeans.h original)
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     if (rank == 0)
     {
         todosAlunos = (Aluno *)malloc(NUM_ALUNOS * sizeof(Aluno)); // Buffer maior para segurança
-        totalAlunos = carregarDataset(todosAlunos);
+        totalAlunos = carregarDataset(todosAlunos, NUM_ALUNOS);
         normalizarAlunos(todosAlunos, totalAlunos);
     }
 
