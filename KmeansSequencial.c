@@ -4,12 +4,12 @@
 #include <omp.h>
 #include "Model/aluno.h"
 #include "Model/dataset.h"
-#include "Model/Kmeans.h"
+#include "Model/kmeans.h"
 
 #define NUM_CLUSTERS 3
 #define MAX_ITERATIONS 10000
 #define NUM_ALUNOS 1000000
-#define NUM_FIT_ITERATIONS 10
+#define NUM_FIT_ITERATIONS 50
 
 void exportarResultados(Aluno *alunos, int total)
 {
