@@ -77,11 +77,10 @@ void initCentroidsMPI(KMeans *model, Aluno *alunos, int rank)
     MPI_Bcast(model->centroids, model->k * sizeof(Aluno), MPI_BYTE, 0, MPI_COMM_WORLD);
 }
 
-
 // Atribui cada aluno ao cluster mais próximo usando OpenMP para paralelismo local.
 void assignClustersHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
 {
-    #pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static)
     for (int i = 0; i < localSize; i++)
     {
         float distanciaClusters_local[model->k];
@@ -97,7 +96,7 @@ void assignClustersHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
 
 /**
  * Atualiza os centroides agregando somas locais (OpenMP) e globais (MPI_Allreduce).
- * Justificativa: O uso de buffers locais evita condições de corrida em OpenMP, 
+ * Justificativa: O uso de buffers locais evita condições de corrida em OpenMP,
  * enquanto o Allreduce sincroniza os resultados entre nós de processamento.
  */
 void updateCentroidsHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
@@ -106,14 +105,21 @@ void updateCentroidsHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
     float *local_sum_faltas = (float *)calloc(model->k, sizeof(float));
     int *local_count = (int *)calloc(model->k, sizeof(int));
 
-    // Passo 1: Soma local com OpenMP
-    #pragma omp parallel
+// Passo 1: Soma local com OpenMP
+#pragma omp parallel
     {
-        float *thread_sum_media = (float *)calloc(model->k, sizeof(float));
-        float *thread_sum_faltas = (float *)calloc(model->k, sizeof(float));
-        int *thread_count = (int *)calloc(model->k, sizeof(int));
+        float thread_sum_media[model->k];
+        float thread_sum_faltas[model->k];
+        int thread_count[model->k];
 
-        #pragma omp for nowait
+        for (int c = 0; c < model->k; c++)
+        {
+            thread_sum_media[c] = 0.0f;
+            thread_sum_faltas[c] = 0.0f;
+            thread_count[c] = 0;
+        }
+
+#pragma omp for nowait
         for (int i = 0; i < localSize; i++)
         {
             int clusterIndex = alunosLocal[i].cluster;
@@ -125,11 +131,11 @@ void updateCentroidsHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
         // Redução crítica para os buffers locais do processo
         for (int c = 0; c < model->k; c++)
         {
-            #pragma omp atomic
+#pragma omp atomic
             local_sum_media[c] += thread_sum_media[c];
-            #pragma omp atomic
+#pragma omp atomic
             local_sum_faltas[c] += thread_sum_faltas[c];
-            #pragma omp atomic
+#pragma omp atomic
             local_count[c] += thread_count[c];
         }
 
@@ -165,44 +171,37 @@ void updateCentroidsHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
     free(global_count);
 }
 
-void fitHybrid(KMeans *model, Aluno *alunosLocal, int localSize, int rank)
+void fitHybrid(KMeans *model, Aluno *alunosLocal, Aluno *todosAlunos, int localSize, int rank, int numIteracoes)
 {
-    double t_start = MPI_Wtime();
-
-    // initCentroidsMPI já faz o Bcast
-    initCentroidsMPI(model, alunosLocal, rank);
-
-    for (int i = 0; i < model->max_iter; i++)
+    for (int iter = 0; iter < numIteracoes; iter++)
     {
-        Aluno old_centroids[model->k];
-        for (int j = 0; j < model->k; j++)
-            old_centroids[j] = model->centroids[j];
-
-        assignClustersHybrid(model, alunosLocal, localSize);
-        updateCentroidsHybrid(model, alunosLocal, localSize);
-
-        int convergiu_local = 1;
-        for (int j = 0; j < model->k; j++)
+        initCentroidsMPI(model, todosAlunos, rank);
+        for (int i = 0; i < model->max_iter; i++)
         {
-            if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.001)
+            Aluno old_centroids[model->k];
+            for (int j = 0; j < model->k; j++)
+                old_centroids[j] = model->centroids[j];
+
+            assignClustersHybrid(model, alunosLocal, localSize);
+            updateCentroidsHybrid(model, alunosLocal, localSize);
+
+            int convergiu_local = 1;
+            for (int j = 0; j < model->k; j++)
             {
-                convergiu_local = 0;
+                if (distEuclidiana(&model->centroids[j], &old_centroids[j]) > 0.001)
+                {
+                    convergiu_local = 0;
+                    break;
+                }
+            }
+
+            int convergiu_global;
+            MPI_Allreduce(&convergiu_local, &convergiu_global, 1, MPI_INT, MPI_LAND, MPI_COMM_WORLD);
+
+            if (convergiu_global)
+            {
                 break;
             }
         }
-
-        int convergiu_global;
-        MPI_Allreduce(&convergiu_local, &convergiu_global, 1, MPI_INT, MPI_LAND, MPI_COMM_WORLD);
-
-        if (convergiu_global)
-        {
-            break;
-        }
-    }
-
-    double t_end = MPI_Wtime();
-    if (rank == 0)
-    {
-        printf("KMeans Hybrid (MPI+OpenMP) fit wall time: %.6f s\n", t_end - t_start);
     }
 }
