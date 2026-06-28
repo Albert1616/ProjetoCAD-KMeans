@@ -8,8 +8,8 @@
 
 #define NUM_CLUSTERS 3
 #define MAX_ITERATIONS 10000
-#define NUM_ALUNOS 200000
-#define NUM_FIT_ITERATIONS 50
+#define NUM_ALUNOS 1000000
+#define NUM_FIT_ITERATIONS 10
 
 void exportarResultados(Aluno *alunos, int total)
 {
@@ -29,7 +29,7 @@ int main()
 {
     // Dados de cada aluno
     Aluno *alunos = (Aluno *)malloc(NUM_ALUNOS * sizeof(Aluno));
-    int numeroAlunos = carregarDataset(alunos);
+    int numeroAlunos = carregarDataset(alunos, NUM_ALUNOS);
 
     normalizarAlunos(alunos, numeroAlunos);
 

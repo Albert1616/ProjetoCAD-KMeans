@@ -25,7 +25,7 @@ char *retornarDadoPorIndice(char *linha, int index)
     return NULL;
 }
 
-int carregarDataset(Aluno *alunos)
+int carregarDataset(Aluno *alunos, int maxAlunos)
 {
     FILE *file = fopen("Data/Student_performance_data.csv", "r");
 
@@ -35,10 +35,10 @@ int carregarDataset(Aluno *alunos)
         return 0;
     }
 
-    char linha[5000];
+    char linha[1024];
     int index = 0;
 
-    while (fgets(linha, sizeof(linha), file) != NULL)
+    while (fgets(linha, sizeof(linha), file) != NULL && index <= maxAlunos)
     {
         if (index == 0)
         {
@@ -46,7 +46,7 @@ int carregarDataset(Aluno *alunos)
             continue;
         }
 
-        char copia[5000];
+        char copia[1024];
         strcpy(copia, linha);
 
         char *colunas[15];
