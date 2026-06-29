@@ -51,8 +51,12 @@ int main(int argc, char **argv)
     }
 
     int maxAlunos = NUM_ALUNOS;
+    int num_repeticoes = 1;
     if (argc > 2) {
         maxAlunos = atoi(argv[2]);
+    }
+    if (argc > 3) {
+        num_repeticoes = atoi(argv[3]);
     }
 
     // Usuário pode definir número de threads em tempo de execução
@@ -109,7 +113,10 @@ int main(int argc, char **argv)
     // Treinamento Híbrido
     inicio = MPI_Wtime();
 
-    fitHybrid(&kmeans, alunosLocal, todosAlunos, localSize, rank, NUM_FIT_ITERATIONS);
+    for (int r = 0; r < num_repeticoes; r++) {
+        kmeans.random_state = 42 + r;
+        fitHybrid(&kmeans, alunosLocal, todosAlunos, localSize, rank, NUM_FIT_ITERATIONS);
+    }
 
     fim = MPI_Wtime();
     tempoLocal = fim - inicio;

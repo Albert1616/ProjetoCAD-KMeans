@@ -37,8 +37,12 @@ int main(int argc, char **argv)
     // Dados de cada aluno
     int totalLinhas = obterNumeroLinhas("Data/Student_performance_data.csv");
     if (totalLinhas <= 0) totalLinhas = 3000;
+    int num_repeticoes = 1;
     if (argc > 2) {
         totalLinhas = atoi(argv[2]);
+    }
+    if (argc > 3) {
+        num_repeticoes = atoi(argv[3]);
     }
     Aluno *alunos = (Aluno *)malloc(totalLinhas * sizeof(Aluno));
     int numeroAlunos = carregarDataset(alunos, totalLinhas);
@@ -54,7 +58,13 @@ int main(int argc, char **argv)
     kmeans.totalAlunos = numeroAlunos;
 
     // Treinamento
-    fit(&kmeans, alunos);
+    double inicio = omp_get_wtime();
+    for (int r = 0; r < num_repeticoes; r++) {
+        kmeans.random_state = 42 + r;
+        fit(&kmeans, alunos);
+    }
+    double fim = omp_get_wtime();
+    printf("Duração do treinamento: %.6f\n", fim - inicio);
 
     exportarResultados(alunos, numeroAlunos);
 

@@ -28,8 +28,12 @@ void exportarResultados(Aluno *alunos, int total)
 int main(int argc, char **argv)
 {
     int maxAlunos = NUM_ALUNOS;
+    int num_repeticoes = 1;
     if (argc > 1) {
         maxAlunos = atoi(argv[1]);
+    }
+    if (argc > 2) {
+        num_repeticoes = atoi(argv[2]);
     }
 
     // Dados de cada aluno
@@ -48,7 +52,10 @@ int main(int argc, char **argv)
 
     double inicio = omp_get_wtime();
     // Treinamento
-    fit(&kmeans, alunos);
+    for (int r = 0; r < num_repeticoes; r++) {
+        kmeans.random_state = 42 + r;
+        fit(&kmeans, alunos);
+    }
     double fim = omp_get_wtime();
 
     printf("Duração do treinamento: %.2f\n", fim - inicio);
