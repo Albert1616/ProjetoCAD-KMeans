@@ -91,3 +91,20 @@ void normalizarAlunos(Aluno *alunos, int total)
         alunos[i].numeroFaltas = (alunos[i].numeroFaltas - minFaltas) / (maxFaltas - minFaltas);
     }
 }
+
+int obterNumeroLinhas(const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+        return 0;
+
+    int linhas = 0;
+    int ch;
+    while ((ch = fgetc(file)) != EOF)
+    {
+        if (ch == '\n')
+            linhas++;
+    }
+    fclose(file);
+    return linhas;
+}
