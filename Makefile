@@ -1,5 +1,7 @@
 CC = gcc
 MPICC = mpicc
+NCC = nvc
+NFLAGS = -O2 -mp=gpu -Wall -IModel
 CFLAGS = -O2 -Wall -IModel
 LDFLAGS = -lm -fopenmp
 
@@ -7,8 +9,9 @@ LDFLAGS = -lm -fopenmp
 SEQ_TARGET = KmeansSequencial
 OMP_TARGET = KmeansOpenMP
 HYB_TARGET = KmeansOpenMPMPI
+OMP_GPU_TARGET = KmeansOpenMPGPU
 
-.PHONY: all clean run-seq run-omp run-omp-mpi help
+.PHONY: all clean run-seq run-omp run-omp-mpi run-omp-gpu help
 
 all: $(SEQ_TARGET) $(OMP_TARGET) $(HYB_TARGET)
 
@@ -24,6 +27,10 @@ $(OMP_TARGET): KmeansOpenMP.c Util/KmeansOpenMP_utils.c Util/CarregarDataset.c
 $(HYB_TARGET): KmeansOpenMPMPI.c Util/KmeansOpenMPMPI_utils.c Util/CarregarDataset.c
 	$(MPICC) $(CFLAGS) -fopenmp -o $@ $^ $(LDFLAGS)
 
+# Versao OpenMP GPU
+$(OMP_GPU_TARGET): KmeansSequencial.c Util/KmeansOpenMPGPU_utils.c Util/CarregarDataset.c
+	$(NCC) $(NFLAGS) -o $@ $^
+
 # Execução
 run-seq: $(SEQ_TARGET)
 	./$(SEQ_TARGET)
@@ -34,8 +41,10 @@ run-omp: $(OMP_TARGET)
 run-omp-mpi: $(HYB_TARGET)
 	mpirun -np 2 ./$(HYB_TARGET) $$(nproc)
 
+run-omp-gpu: $(OMP_GPU_TARGET)
+	./$(OMP_GPU_TARGET)
 clean:
-	rm -f $(SEQ_TARGET) $(OMP_TARGET) $(HYB_TARGET) resultados*.csv *.o Util/*.o
+	rm -f $(SEQ_TARGET) $(OMP_TARGET) $(HYB_TARGET)  $(OMP_GPU_TARGET) resultados*.csv *.o Util/*.o
 
 help:
 	@echo "Alvos disponíveis:"
@@ -46,6 +55,7 @@ help:
 	@echo "  make run-seq       - Compila e roda versão sequencial"
 	@echo "  make run-omp       - Compila e roda versão OpenMP com nproc threads"
 	@echo "  make run-omp-mpi   - Compila e roda versão híbrida com 2 processos e nproc threads"
+	@echo "  make run-omp-gpu   - Compila e roda versão OpenMP na GPU"
 	@echo "  make clean         - Remove binários e arquivos temporários"
 
 	@echo ""
