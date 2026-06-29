@@ -25,7 +25,9 @@ void exportarResultados(Aluno *alunos, int total)
 int main()
 {
     // Dados de cada aluno
-    Aluno *alunos = (Aluno *)malloc(3000 * sizeof(Aluno));
+    int totalLinhas = obterNumeroLinhas("Data/Student_performance_data.csv");
+    if (totalLinhas <= 0) totalLinhas = 3000;
+    Aluno *alunos = (Aluno *)malloc(totalLinhas * sizeof(Aluno));
     int numeroAlunos = carregarDataset(alunos);
 
     normalizarAlunos(alunos, numeroAlunos);

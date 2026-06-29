@@ -50,7 +50,9 @@ int main(int argc, char **argv)
         }
         printf("MPI Size: %d processes, OpenMP Threads per process: %d\n", size, omp_get_max_threads());
 
-        todosAlunos = (Aluno *)malloc(10000 * sizeof(Aluno)); // Buffer maior para segurança
+        int totalLinhas = obterNumeroLinhas("Data/Student_performance_data.csv");
+        if (totalLinhas <= 0) totalLinhas = 10000;
+        todosAlunos = (Aluno *)malloc(totalLinhas * sizeof(Aluno));
         totalAlunos = carregarDataset(todosAlunos);
         normalizarAlunos(todosAlunos, totalAlunos);
     }
