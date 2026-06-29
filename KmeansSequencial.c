@@ -52,9 +52,14 @@ int main(int argc, char **argv)
 
     double inicio = omp_get_wtime();
     // Treinamento
-    for (int r = 0; r < num_repeticoes; r++) {
-        kmeans.random_state = 42 + r;
-        fit(&kmeans, alunos);
+#ifdef _OPENMP_GPU
+    #pragma omp target data map(tofrom: alunos[0:numeroAlunos])
+#endif
+    {
+        for (int r = 0; r < num_repeticoes; r++) {
+            kmeans.random_state = 42 + r;
+            fit(&kmeans, alunos);
+        }
     }
     double fim = omp_get_wtime();
 

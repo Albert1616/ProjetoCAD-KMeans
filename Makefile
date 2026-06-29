@@ -1,7 +1,7 @@
 CC = gcc
 MPICC = mpicc
 NCC = nvc
-NFLAGS = -O2 -mp=gpu -Wall -IModel
+NFLAGS = -O2 -mp=gpu -Wall -IModel -D_OPENMP_GPU
 CFLAGS = -O2 -Wall -IModel
 LDFLAGS = -lm -fopenmp
 
