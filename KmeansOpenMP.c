@@ -35,8 +35,13 @@ int main(int argc, char **argv)
 
     printf("Using %d OpenMP threads\n", omp_get_max_threads());
     // Dados de cada aluno
-    Aluno *alunos = (Aluno *)malloc(3000 * sizeof(Aluno));
-    int numeroAlunos = carregarDataset(alunos);
+    int totalLinhas = obterNumeroLinhas("Data/Student_performance_data.csv");
+    if (totalLinhas <= 0) totalLinhas = 3000;
+    if (argc > 2) {
+        totalLinhas = atoi(argv[2]);
+    }
+    Aluno *alunos = (Aluno *)malloc(totalLinhas * sizeof(Aluno));
+    int numeroAlunos = carregarDataset(alunos, totalLinhas);
 
     normalizarAlunos(alunos, numeroAlunos);
 

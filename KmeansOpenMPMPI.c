@@ -50,13 +50,27 @@ int main(int argc, char **argv)
             omp_set_num_threads(nt);
     }
 
+    int maxAlunos = NUM_ALUNOS;
+    if (argc > 2) {
+        maxAlunos = atoi(argv[2]);
+    }
+
     // Usuário pode definir número de threads em tempo de execução
     printf("MPI Size: %d processes, OpenMP Threads per process: %d\n", size, omp_get_max_threads());
 
     if (rank == 0)
     {
-        todosAlunos = (Aluno *)malloc(NUM_ALUNOS * sizeof(Aluno)); // Buffer maior para segurança
-        totalAlunos = carregarDataset(todosAlunos, NUM_ALUNOS);
+        todosAlunos = (Aluno *)malloc(maxAlunos * sizeof(Aluno)); // Buffer maior para segurança
+        totalAlunos = carregarDataset(todosAlunos, maxAlunos);
+        // Usuário pode definir número de threads em tempo de execução
+        if (argc > 1)
+        {
+            int nt = atoi(argv[1]);
+            if (nt > 0)
+                omp_set_num_threads(nt);
+        }
+        printf("MPI Size: %d processes, OpenMP Threads per process: %d\n", size, omp_get_max_threads());
+
         normalizarAlunos(todosAlunos, totalAlunos);
     }
 

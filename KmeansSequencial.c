@@ -25,11 +25,16 @@ void exportarResultados(Aluno *alunos, int total)
     fclose(file);
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    int maxAlunos = NUM_ALUNOS;
+    if (argc > 1) {
+        maxAlunos = atoi(argv[1]);
+    }
+
     // Dados de cada aluno
-    Aluno *alunos = (Aluno *)malloc(NUM_ALUNOS * sizeof(Aluno));
-    int numeroAlunos = carregarDataset(alunos, NUM_ALUNOS);
+    Aluno *alunos = (Aluno *)malloc(maxAlunos * sizeof(Aluno));
+    int numeroAlunos = carregarDataset(alunos, maxAlunos);
 
     normalizarAlunos(alunos, numeroAlunos);
 
@@ -43,7 +48,7 @@ int main()
 
     double inicio = omp_get_wtime();
     // Treinamento
-    fit(&kmeans, alunos, NUM_FIT_ITERATIONS);
+    fit(&kmeans, alunos);
     double fim = omp_get_wtime();
 
     printf("Duração do treinamento: %.2f\n", fim - inicio);
