@@ -138,10 +138,6 @@ void updateCentroidsHybrid(KMeans *model, Aluno *alunosLocal, int localSize)
 #pragma omp atomic
             local_count[c] += thread_count[c];
         }
-
-        free(thread_sum_media);
-        free(thread_sum_faltas);
-        free(thread_count);
     }
 
     // Passo 2: Agregação global com MPI
