@@ -4,27 +4,6 @@
 #include "../Model/aluno.h"
 #include "../Model/dataset.h"
 
-char *retornarDadoPorIndice(char *linha, int index)
-{
-    char copia[strlen(linha) + 1];
-    strcpy(copia, linha);
-    int contador = 0;
-
-    char *dados = strtok(copia, ",");
-
-    while (dados != NULL)
-    {
-        if (contador == index)
-        {
-            return strdup(dados);
-        }
-        dados = strtok(NULL, ",");
-        contador++;
-    }
-
-    return NULL;
-}
-
 int carregarDataset(Aluno *alunos, int maxAlunos)
 {
     FILE *file = fopen("Data/Student_performance_data.csv", "r");
