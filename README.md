@@ -20,6 +20,12 @@ Projeto em C que aplica KMeans para agrupar alunos por média e número de falta
 - `Util/KmeansOpenMPMPI_utils.c` — Utilitários da versão OpenMP+MPI.
 - `Util/CarregarDataset.c` — Carregamento e normalização do dataset.
 - `Makefile` — Compila todas as versões e oferece alvos de execução.
+- 
+## Divisão de tarefas
+- `Versão sequencial` - Matheus Albert
+- `Versão OpenMP + MPI` - Lucas Cunha e Caio Daniel
+- `Versão OpenMP com GPU` - Ivyson Lucas e Chistian Daniel
+- `Versão CUDA` - Matheus Albert
 
 ## Compilação usando o Makefile
 Navegue até o diretório do projeto e execute:
