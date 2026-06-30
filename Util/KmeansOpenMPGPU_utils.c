@@ -102,29 +102,32 @@ void updateCentroids(KMeans *model, Aluno *alunos)
     int k = model->k;
     Aluno *centroids = model->centroids;
 
-    #pragma omp target teams loop map(to: alunos[0:n]) map(tofrom: centroids[0:k])
+    float *sum_media = (float *)calloc(k,sizeof(float));
+    float *sum_faltas = (float *)calloc(k, sizeof(float));
+    int *count = (int *)calloc(k, sizeof(int));
+
+    #pragma omp target teams distribute parallel for thread_limit(omp_get_max_threads()) map(to: alunos[0:n]) reduction(+:sum_media[:k], sum_faltas[:k], count[:k])
+    for (int i = 0; i < n; i++)
+    {
+        int j = alunos[i].cluster;
+        sum_media[j] += alunos[i].media;
+        sum_faltas[j] += alunos[i].numeroFaltas;
+        count[j]++;
+    }
+
+    #pragma omp target teams distribute parallel for thread_limit(omp_get_max_threads()) map(to: sum_media[0:k], sum_faltas[0:k], count[0:k]) map(from: centroids[0:k])
     for (int j = 0; j < k; j++)
     {
-        float local_sum_media = 0.0f;
-        int local_sum_faltas = 0;
-        int local_count = 0;
-
-        for (int i = 0; i < n; i++)
+        if (count[j] > 0)
         {
-            if (alunos[i].cluster == j)
-            {
-                local_sum_media += alunos[i].media;
-                local_sum_faltas += alunos[i].numeroFaltas;
-                local_count++;
-            }
-        }
-
-        if (local_count > 0)
-        {
-            centroids[j].media = local_sum_media / local_count;
-            centroids[j].numeroFaltas = (float)local_sum_faltas / local_count;
+            centroids[j].media = sum_media[j] / count[j];
+            centroids[j].numeroFaltas = sum_faltas[j] / count[j];
         }
     }
+
+    free(sum_media);
+    free(sum_faltas);
+    free(count);
 }
 
 void fit(KMeans *model, Aluno *alunos)
