@@ -11,7 +11,7 @@ int carregarDataset(Aluno *alunos, int numAlunos)
 
     gettimeofday(&start_read, NULL);
 
-    FILE *file = fopen("../Data/Student_performance_data.csv", "r");
+    FILE *file = fopen("../../Data/Student_performance_data.csv", "r");
 
     if (file == NULL)
     {
