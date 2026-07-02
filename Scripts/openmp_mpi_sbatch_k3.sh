@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition amd-512
 #SBATCH --nodes 1
-#SBATCH --ntasks-per-node=2
+#SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=32
 #SBATCH --exclusive
 #SBATCH --time 04:00:00
@@ -25,7 +25,7 @@ sed -i "s/#define NUM_CLUSTERS .*/#define NUM_CLUSTERS $K/g" KmeansOpenMPMPI.c
 make clean > /dev/null
 make KmeansOpenMPMPI > /dev/null
 
-MPI_PROCS=2
+MPI_PROCS=4
 THREADS=32
 
 echo ">>> EXPERIMENTO: ESCALABILIDADE FRACA (VARIANDO ALUNOS) K=$K <<<"
