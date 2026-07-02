@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
-#include "aluno.h"
-#include "dataset.h"
+#include "../model/aluno.h"
+#include "../model/dataset.h"
 
 int carregarDataset(Aluno *alunos, int numAlunos)
 {

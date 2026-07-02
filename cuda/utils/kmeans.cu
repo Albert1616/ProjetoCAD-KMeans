@@ -1,8 +1,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "aluno.h"
-#include "kmeans.h"
+#include "../model/aluno.h"
+#include "../model/kmeans.h"
 
 #define MAX_K 1000
 

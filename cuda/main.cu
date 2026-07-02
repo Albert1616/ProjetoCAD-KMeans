@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cuda_runtime_api.h>
-#include "aluno.h"
-#include "dataset.h"
-#include "kmeans.h"
+#include "model/aluno.h"
+#include "model/dataset.h"
+#include "model/kmeans.h"
 
 #define NUM_CLUSTERS 3
 #define MAX_ITERATIONS 10000
