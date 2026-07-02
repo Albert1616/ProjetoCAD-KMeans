@@ -21,7 +21,7 @@ module load compilers/nvidia/cuda/12.6
 
 set -e
 
-nvcc -arch=sm_70 -O3 main.cu kmeans.cu dataset.cu -o cuda_kmeans
+nvcc -arch=sm_70 -O3 cuda/main.cu cuda/utils/kmeans.cu cuda/utils/dataset.cu -o cuda_kmeans
 
 nsys profile --stats=true --trace=cuda,osrt --force-overwrite=true -o profile_kmeans ./cuda_kmeans
 
