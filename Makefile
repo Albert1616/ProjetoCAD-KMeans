@@ -11,7 +11,7 @@ OMP_TARGET = KmeansOpenMP
 HYB_TARGET = KmeansOpenMPMPI
 OMP_GPU_TARGET = KmeansOpenMPGPU
 
-.PHONY: all clean run-seq run-omp run-omp-mpi run-omp-gpu help
+.PHONY: all clean run-seq run-omp run-omp-mpi run-omp-gpu test-cuda help
 
 all: $(SEQ_TARGET) $(OMP_TARGET) $(HYB_TARGET)
 
@@ -43,6 +43,11 @@ run-omp-mpi: $(HYB_TARGET)
 
 run-omp-gpu: $(OMP_GPU_TARGET)
 	./$(OMP_GPU_TARGET)
+
+#teste pro npad
+test-cuda:
+	sbatch Scripts/cuda_sbatch.sh
+
 clean:
 	rm -f $(SEQ_TARGET) $(OMP_TARGET) $(HYB_TARGET)  $(OMP_GPU_TARGET) resultados*.csv *.o Util/*.o
 
